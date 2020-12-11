@@ -1,0 +1,24 @@
+{
+  "name": "toolshed-location",
+  "version": "1.0.0",
+  "description": "Location service to use postcode and determine how are someone is away",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robbaile/toolshed-location.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robbaile/toolshed-location/issues"
+  },
+  "homepage": "https://github.com/robbaile/toolshed-location#readme",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}
