@@ -1,14 +1,17 @@
-const axois = require('axios');
+const axios = require('axios');
+
+const calculateDistance = require('../helpers/calculateDistance');
+const { MY_LOCATION_LATITUDE, MY_LOCATION_LONGITUDE } = require('../constants');
 
 module.exports = async (req, res) => {
     try {
-        const [customerLocation, myLocation] = await axois.all([
-            axois.get(`https://api.postcodes.io/postcodes/${req.params.postcode}`),
-            axois.get(`https://api.postcodes.io/postcodes/SW6 1NF`)
-        ]);
+        const customerLocation = await axios.get(`https://api.postcodes.io/postcodes/${req.params.postcode}`)
+		const { latitude, longitude } = customerLocation.data.result;
             
-        const distanceFromMyLocation = distance(customerLocation.data.result.latitude, customerLocation.data.result.longitude, 
-            myLocation.data.result.latitude, myLocation.data.result.longitude, "M");
+        const distanceFromMyLocation = calculateDistance(latitude, longitude, 
+			MY_LOCATION_LATITUDE, MY_LOCATION_LONGITUDE, "M");
+		
+		console.log(`myLongitude: ${MY_LOCATION_LONGITUDE}, Latitude: ${MY_LOCATION_LATITUDE}, customerLong: ${longitude}, customerLat: ${latitude} ,Distance: ${distanceFromMyLocation}`);
 
 		let isDeliverable = false
 
@@ -16,31 +19,9 @@ module.exports = async (req, res) => {
 			isDeliverable = false
 		}
 
-        res.send({ distance: distanceFromMyLocation, isDeliverable });
-
+        res.send({ isDeliverable });
     } catch (error) {
         res.status(500).json({ success: false, error: error });
     }
 }
 
-const distance = (lat1, lon1, lat2, lon2, unit) => {
-	if ((lat1 == lat2) && (lon1 == lon2)) {
-		return 0;
-	}
-	else {
-		var radlat1 = Math.PI * lat1/180;
-		var radlat2 = Math.PI * lat2/180;
-		var theta = lon1-lon2;
-		var radtheta = Math.PI * theta/180;
-		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-		if (dist > 1) {
-			dist = 1;
-		}
-		dist = Math.acos(dist);
-		dist = dist * 180/Math.PI;
-		dist = dist * 60 * 1.1515;
-		if (unit=="K") { dist = dist * 1.609344 }
-		if (unit=="N") { dist = dist * 0.8684 }
-		return dist;
-	}
-}
